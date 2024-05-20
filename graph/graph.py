@@ -11,8 +11,8 @@ class Graph:
     def add_node(self, node_id: int, x: int, y: int):
         self.nodes[node_id] = Node(node_id, x, y)
 
-    def add_edge(self, from_node: int, to_node: int, capacity: float):
-        edge = Edge(from_node, to_node, capacity)
+    def add_edge(self, from_node: int, to_node: int, capacity: float, cost: float = 0.0):
+        edge = Edge(from_node, to_node, capacity, cost)
         self.edges.append(edge)
 
     def get_edges(self):
@@ -32,6 +32,9 @@ class Graph:
             if edge.from_node == from_node and edge.to_node == to_node:
                 return edge
         return None
+    
+    def add_exra_info(self, node_id: int, extra_info: str):
+        self.nodes[node_id].add_extra_info(extra_info)
 
     def copy(self) -> 'Graph':
         """Returns a deep copy of the graph."""

@@ -5,16 +5,15 @@ import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
 class FordFulkerson(Algorithm):
-    def __init__(self, graph: Graph, name: str = "Ford Fulkerson"):
+    def __init__(self, graph: Graph, name: str = "Ford-Fulkerson"):
         super().__init__(graph, name)
         self.iterations = [graph.copy()]
 
     def run(self, source: int, sink: int) -> Tuple[float, List[Graph]]:
         # Step 1: Initialize flow and max flow
         max_flow = 0.0
-        for edge in self.graph.get_edges():
+        for edge in self.graph.edges:
             edge.flow = 0.0
 
         def bfs_find_augmenting_path() -> Tuple[bool, Dict[int, Tuple[int, float]]]:
@@ -62,38 +61,56 @@ class FordFulkerson(Algorithm):
             delta = augment_flow(path)
             max_flow += delta
             # Record the state of the graph
-            self.iterations.append(self.graph.copy())
+            copy_graph = self.graph.copy()
+            for node_id, (parent, flow) in path.items():
+                if parent is not None:
+                    copy_graph.add_exra_info(node_id, f"[{parent}, {flow}]")
+            self.iterations.append(copy_graph)
 
         return max_flow, self.iterations
 
-    def visualize_result(self):
-        """Visualizes the result of the Ford-Fulkerson algorithm using the last graph in the iterations list."""
-        graph = self.iterations[-1]
+
+    def _visualize_graph(self, graph: Graph, iteration: int, ax: plt.Axes):
+        """Helper function to visualize a graph."""
         G = nx.DiGraph()
 
         for node_id, node in graph.nodes.items():
-            G.add_node(node_id, pos=(node.x, node.y), label=node.extra_info)
+            G.add_node(node_id, pos=(node.x, node.y))
 
         for edge in graph.edges:
             G.add_edge(edge.from_node, edge.to_node,
                        weight=edge.flow, capacity=edge.capacity)
 
         pos = nx.get_node_attributes(G, 'pos')
-        G.to
+        
 
-        nx.draw_networkx_nodes(G, pos, node_size=500, node_color='lightblue')
-        nx.draw_networkx_labels(G, pos, font_size=10, font_color='black')
+        nx.draw_networkx_nodes(G, pos, node_size=500,
+                               node_color='lightblue', ax=ax)
+        nx.draw_networkx_labels(
+            G, pos, font_size=10, font_color='black', ax=ax)
 
-        nx.draw_networkx_edges(G, pos, edge_color='black', arrows=True)
+
+        nx.draw_networkx_edges(
+            G, pos, edge_color='black', arrows=True, ax=ax)
         edge_labels = {
             (u, v): f"{d['weight']}/{d['capacity']}" for u, v, d in G.edges(data=True)}
         nx.draw_networkx_edge_labels(
-            G, pos, edge_labels=edge_labels, font_size=8)
+            G, pos, edge_labels=edge_labels, font_size=8, ax=ax)
 
-        plt.title("Ford-Fulkerson Result")
-        plt.axis('off')
-        plt.show()
 
+        ## Test per mostrare il padre e il flusso
+        # for node_id, node in graph.nodes.items():
+        #     # Get the position of the node
+        #     x, y = node.x, node.y
+        #     x2, y2 = pos[node_id]
+
+        #     ax.text(x, y - 0.2, s=node.extra_info, fontsize=6, horizontalalignment='center', verticalalignment='bottom', weight='bold')
+        ax.set_title(f"Ford-Fulkerson Iteration {iteration + 1}")
+        ax.axis('off')
+
+
+
+        
 if __name__ == "__main__":
     from graph import Node, Edge, graph
 
@@ -146,6 +163,7 @@ if __name__ == "__main__":
     ff = FordFulkerson(g)
     max_flow, iterations = ff.run(0, 8)
 
+    ff.export_to_image()
     ff.visualize_result()
     print(f"Max Flow: {max_flow}")
     for i, iteration in enumerate(iterations):
