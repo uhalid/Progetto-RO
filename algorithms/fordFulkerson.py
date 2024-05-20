@@ -2,6 +2,8 @@ from typing import Tuple, List, Dict
 from .algorithm import Algorithm
 from graph import Graph
 import heapq
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class FordFulkerson(Algorithm):
@@ -64,6 +66,33 @@ class FordFulkerson(Algorithm):
 
         return max_flow, self.iterations
 
+    def visualize_result(self):
+        """Visualizes the result of the Ford-Fulkerson algorithm using the last graph in the iterations list."""
+        graph = self.iterations[-1]
+        G = nx.DiGraph()
+
+        for node_id, node in graph.nodes.items():
+            G.add_node(node_id, pos=(node.x, node.y), label=node.extra_info)
+
+        for edge in graph.edges:
+            G.add_edge(edge.from_node, edge.to_node,
+                       weight=edge.flow, capacity=edge.capacity)
+
+        pos = nx.get_node_attributes(G, 'pos')
+        G.to
+
+        nx.draw_networkx_nodes(G, pos, node_size=500, node_color='lightblue')
+        nx.draw_networkx_labels(G, pos, font_size=10, font_color='black')
+
+        nx.draw_networkx_edges(G, pos, edge_color='black', arrows=True)
+        edge_labels = {
+            (u, v): f"{d['weight']}/{d['capacity']}" for u, v, d in G.edges(data=True)}
+        nx.draw_networkx_edge_labels(
+            G, pos, edge_labels=edge_labels, font_size=8)
+
+        plt.title("Ford-Fulkerson Result")
+        plt.axis('off')
+        plt.show()
 
 if __name__ == "__main__":
     from graph import Node, Edge, graph
@@ -89,15 +118,15 @@ if __name__ == "__main__":
     #     print(iteration)
 
     g = Graph()
-    g.add_node(0, 0, 0)
-    g.add_node(1, 0, 0)
-    g.add_node(2, 0, 0)
-    g.add_node(3, 0, 0)
-    g.add_node(4, 0, 0)
-    g.add_node(5, 0, 0)
-    g.add_node(6, 0, 0)
-    g.add_node(7, 0, 0)
-    g.add_node(8, 0, 0)
+    g.add_node(0, 0, 3)
+    g.add_node(1, 1, 5)
+    g.add_node(2, 2, 5)
+    g.add_node(3, 1, 0)
+    g.add_node(4, 2, 0)
+    g.add_node(5, 3, 3)
+    g.add_node(6, 3, 0)
+    g.add_node(7, 3, 5)
+    g.add_node(8, 4, 3)
 
     g.add_edge(0, 1, 14)  # Node 1 -> Node 2
     g.add_edge(0, 3, 23)  # Node 1 -> Node 4
@@ -117,6 +146,7 @@ if __name__ == "__main__":
     ff = FordFulkerson(g)
     max_flow, iterations = ff.run(0, 8)
 
+    ff.visualize_result()
     print(f"Max Flow: {max_flow}")
     for i, iteration in enumerate(iterations):
         print(f"Iteration {i}:")
