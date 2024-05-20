@@ -1,13 +1,13 @@
 from typing import Tuple, List, Dict
 from .algorithm import Algorithm
 from graph import Graph
-
+import heapq
 
 
 class FordFulkerson(Algorithm):
     def __init__(self, graph: Graph, name: str = "Ford Fulkerson"):
         super().__init__(graph, name)
-        self.iterations = []
+        self.iterations = [graph.copy()]
 
     def run(self, source: int, sink: int) -> Tuple[float, List[Graph]]:
         # Step 1: Initialize flow and max flow
@@ -18,9 +18,10 @@ class FordFulkerson(Algorithm):
         def bfs_find_augmenting_path() -> Tuple[bool, Dict[int, Tuple[int, float]]]:
             """Perform BFS to find an augmenting path and return the path as a dictionary."""
             parent = {source: (None, float('inf'))}
-            queue = [source]
-            while queue:
-                current = queue.pop(0)
+            min_heap = [source]
+            while min_heap:
+                current = heapq.heappop(min_heap)
+
                 for edge in self.graph.get_edges_from(current):
                     residual_capacity = edge.capacity - edge.flow
                     if edge.to_node not in parent and residual_capacity > 0:  # forward edge
@@ -28,14 +29,15 @@ class FordFulkerson(Algorithm):
                             parent[current][1], residual_capacity))
                         if edge.to_node == sink:
                             return True, parent
-                        queue.append(edge.to_node)
+                        heapq.heappush(min_heap, edge.to_node)
                 for edge in self.graph.get_edges_to(current):
                     if edge.from_node not in parent and edge.flow > 0:  # backward edge
                         parent[edge.from_node] = (
-                            current, min(parent[current][1], edge.flow))
+                            -current, min(parent[current][1], edge.flow))
                         if edge.from_node == sink:
                             return True, parent
-                        queue.append(edge.from_node)
+                        # queue.append(edge.from_node)
+                        heapq.heappush(min_heap, edge.from_node)
             return False, parent
 
         def augment_flow(path: Dict[int, Tuple[int, float]]):
@@ -43,29 +45,22 @@ class FordFulkerson(Algorithm):
             flow = path[sink][1]
             current = sink
             while current != source:
-                prev, _ = path[current]
-                if edge:= self.graph.get_edge_between(prev, current):
+                prev, _ = path[abs(current)]
+                if edge:= self.graph.get_edge_between(abs(prev), abs(current)):
                     edge.flow += flow
-                if edge:= self.graph.get_edge_between(current, prev):
+                if edge:= self.graph.get_edge_between(abs(current), abs(prev)):
                     edge.flow -= flow
                 current = prev
             return flow
 
-        i = 0 
         while True:
             found, path = bfs_find_augmenting_path()
             if not found:
                 break
             delta = augment_flow(path)
-            print(found, path, delta)
             max_flow += delta
             # Record the state of the graph
             self.iterations.append(self.graph.copy())
-            # print(self.graph)
-            # if i == 0:
-            #     exit()
-            # print("-" * 5 + f"{i}" + "-" * 5 )
-            # i += 1
 
         return max_flow, self.iterations
 
@@ -108,12 +103,14 @@ if __name__ == "__main__":
     g.add_edge(0, 3, 23)  # Node 1 -> Node 4
     g.add_edge(1, 2, 10)  # Node 2 -> Node 3
     g.add_edge(1, 3, 9)   # Node 2 -> Node 4
-    g.add_edge(4, 1, 11)  # Node 2 -> Node 5
     g.add_edge(2, 4, 12)  # Node 3 -> Node 5
+    g.add_edge(2, 7, 18)  # Node 3 -> Node 8
     g.add_edge(3, 4, 26)  # Node 4 -> Node 5
+    g.add_edge(4, 1, 11)  # Node 5 -> Node 4
     g.add_edge(4, 5, 25)  # Node 5 -> Node 6
     g.add_edge(4, 6, 4)   # Node 5 -> Node 7
-    g.add_edge(5, 7, 7)   # Node 6 -> Node 8
+    g.add_edge(5, 7, 8)   # Node 6 -> Node 8
+    g.add_edge(5, 6, 7)   # Node 6 -> Node 7
     g.add_edge(6, 8, 15)   # Node 7 -> Node 9
     g.add_edge(7, 8, 20)  # Node 8 -> Node 9
 
