@@ -2,7 +2,7 @@
 
 import sys
 from graph.graph import Graph
-from graph.node import Node  
+from algorithms.algorithm import Algorithm
 
 
 def read_graph(filename: str) -> Graph:

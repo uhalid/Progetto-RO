@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 class FordFulkerson(Algorithm):
     def __init__(self, graph: Graph, name: str = "Ford-Fulkerson"):
         super().__init__(graph, name)
-        self.iterations = [graph.copy()]
 
     def run(self, source: int, sink: int) -> Tuple[float, List[Graph]]:
         # Step 1: Initialize flow and max flow
@@ -64,7 +63,10 @@ class FordFulkerson(Algorithm):
             copy_graph = self.graph.copy()
             for node_id, (parent, flow) in path.items():
                 if parent is not None:
-                    copy_graph.add_exra_info(node_id, f"[{parent}, {flow}]")
+                    copy_graph.add_label(node_id, f"[{parent}, {flow}]")
+            for edge in copy_graph.edges:
+                edge.label = f"{edge.flow}/{edge.capacity}"
+
             self.iterations.append(copy_graph)
 
         return max_flow, self.iterations
@@ -98,41 +100,17 @@ class FordFulkerson(Algorithm):
             G, pos, edge_labels=edge_labels, font_size=8, ax=ax)
 
 
-        ## Test per mostrare il padre e il flusso
-        # for node_id, node in graph.nodes.items():
-        #     # Get the position of the node
-        #     x, y = node.x, node.y
-        #     x2, y2 = pos[node_id]
-
-        #     ax.text(x, y - 0.2, s=node.extra_info, fontsize=6, horizontalalignment='center', verticalalignment='bottom', weight='bold')
         ax.set_title(f"Ford-Fulkerson Iteration {iteration + 1}")
         ax.axis('off')
+
+
+
 
 
 
         
 if __name__ == "__main__":
     from graph import Node, Edge, graph
-
-    # g = Graph()
-    # g.add_node(0, 0, 0)
-    # g.add_node(1, 1, 1)
-    # g.add_node(2, 2, 0)
-    # g.add_node(3, 3, 1)
-
-    # g.add_edge(0, 1, 10.0)
-    # g.add_edge(0, 2, 5.0)
-    # g.add_edge(1, 2, 15.0)
-    # g.add_edge(1, 3, 10.0)
-    # g.add_edge(2, 3, 10.0)
-
-    # ff = FordFulkerson(g)
-    # max_flow, iterations = ff.run(0, 3)
-
-    # print(f"Max Flow: {max_flow}")
-    # for i, iteration in enumerate(iterations):
-    #     print(f"Iteration {i}:")
-    #     print(iteration)
 
     g = Graph()
     g.add_node(0, 0, 3)

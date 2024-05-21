@@ -33,8 +33,8 @@ class Graph:
                 return edge
         return None
     
-    def add_exra_info(self, node_id: int, extra_info: str):
-        self.nodes[node_id].add_extra_info(extra_info)
+    def add_label(self, node_id: int, label: str):
+        self.nodes[node_id].add_label(label)
 
     def copy(self) -> 'Graph':
         """Returns a deep copy of the graph."""

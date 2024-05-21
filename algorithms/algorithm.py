@@ -10,6 +10,7 @@ class Algorithm:
         self.graph: Graph = graph
         self.name: str = name
         self.current_iteration = 0
+        self.iterations = [graph.copy()]
 
     def run(self):
         raise NotImplementedError("Subclasses should implement this!")
@@ -17,16 +18,25 @@ class Algorithm:
     def _visualize_graph(self, graph: Graph, iteration: int, ax: plt.Axes):
         raise NotImplementedError("Subclasses should implement this!")
 
+
+
     def export_to_image(self):
         """Exports the result of each iteration to separate image files."""
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         folder_name = f"{self.name} - {timestamp}"
         os.makedirs(folder_name, exist_ok=True)
+        from utils.latexGraphExporter import LatexGraphExporter
+        lge = LatexGraphExporter()
         for i, iteration in enumerate(self.iterations):
             fig, ax = plt.subplots()
             self._visualize_graph(iteration, i, ax)
+
             plt.savefig(f"{folder_name}/interaction_{i+1}.png")
+            with open(f"{folder_name}/interaction_{i+1}.tex", "w") as file:
+                file.write(lge.to_latex(iteration))
             plt.close(fig)
+        print(f"Images exported successfully! Check the folder {folder_name}")
+        
 
     def visualize_result(self):
         fig, ax = plt.subplots()
