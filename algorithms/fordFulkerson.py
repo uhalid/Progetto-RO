@@ -2,9 +2,6 @@ from typing import Tuple, List, Dict
 from .algorithm import Algorithm
 from graph import Graph
 import heapq
-import networkx as nx
-import matplotlib.pyplot as plt
-
 class FordFulkerson(Algorithm):
     def __init__(self, graph: Graph, name: str = "Ford-Fulkerson"):
         super().__init__(graph, name)
@@ -61,47 +58,18 @@ class FordFulkerson(Algorithm):
             max_flow += delta
             # Record the state of the graph
             copy_graph = self.graph.copy()
+            
             for node_id, (parent, flow) in path.items():
                 if parent is not None:
                     copy_graph.add_label(node_id, f"[{parent}, {flow}]")
+                else:
+                    copy_graph.add_label(node_id, f"[ - , - ]")
             for edge in copy_graph.edges:
                 edge.label = f"{edge.flow}/{edge.capacity}"
 
             self.iterations.append(copy_graph)
 
         return max_flow, self.iterations
-
-
-    def _visualize_graph(self, graph: Graph, iteration: int, ax: plt.Axes):
-        """Helper function to visualize a graph."""
-        G = nx.DiGraph()
-
-        for node_id, node in graph.nodes.items():
-            G.add_node(node_id, pos=(node.x, node.y))
-
-        for edge in graph.edges:
-            G.add_edge(edge.from_node, edge.to_node,
-                       weight=edge.flow, capacity=edge.capacity)
-
-        pos = nx.get_node_attributes(G, 'pos')
-        
-
-        nx.draw_networkx_nodes(G, pos, node_size=500,
-                               node_color='lightblue', ax=ax)
-        nx.draw_networkx_labels(
-            G, pos, font_size=10, font_color='black', ax=ax)
-
-
-        nx.draw_networkx_edges(
-            G, pos, edge_color='black', arrows=True, ax=ax)
-        edge_labels = {
-            (u, v): f"{d['weight']}/{d['capacity']}" for u, v, d in G.edges(data=True)}
-        nx.draw_networkx_edge_labels(
-            G, pos, edge_labels=edge_labels, font_size=8, ax=ax)
-
-
-        ax.set_title(f"Ford-Fulkerson Iteration {iteration + 1}")
-        ax.axis('off')
 
 
 

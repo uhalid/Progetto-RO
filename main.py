@@ -41,23 +41,9 @@ def main(filename: str):
         print("1. Ford-Fulkerson")
         selection = input("Enter the number of the algorithm: ")
         if selection == "1":
-            from algorithms.fordFulkerson import FordFulkerson
-            ff = FordFulkerson(graph)
-            source = int(input("Enter the source node: "))
-            sink = int(input("Enter the sink node: "))
-            max_flow, _ = ff.run(source, sink)
-            print(f"Max Flow: {max_flow}")
-
-            print("How would you like to visualize the result?")
-            print("1. Export to image files")
-            print("2. Visualize interactively")
-            visualization = input("Enter the number of the visualization method: ")
-            if visualization == "1":
-                ff.export_to_image()
-            elif visualization == "2":
-                ff.visualize_result()
-            else:
-                print("Invalid selection.")
+            from managers.fordFulkersonManager import FordFulkersonManager
+            manager = FordFulkersonManager(graph)
+            manager.run()
         else:
             print("Invalid selection.")
 
