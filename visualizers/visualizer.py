@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 from graph.graph import Graph
+from graph.node import Node
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import os, datetime
@@ -17,25 +19,49 @@ class Visualizer(ABC):
     def _visualize_graph(self, graph: Graph, iteration: int, ax: plt.Axes):
         pass
 
+    def export_to_file(self, export_function: Callable):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        folder_name = f"{self.name} - {timestamp}"
+        os.makedirs(f"results/{self.name}/{folder_name}", exist_ok=True)
+
+        for i, iteration in enumerate(self.iterations):
+            export_function(iteration, i, folder_name)
+        return folder_name
 
     def export_to_image(self):
         """Exports the result of each iteration to separate image files."""
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        folder_name = f"{self.name} - {timestamp}"
-        os.makedirs(folder_name, exist_ok=True)
-        from utils.latexGraphExporter import LatexGraphExporter
-        lge = LatexGraphExporter()
-        for i, iteration in enumerate(self.iterations):
+        def write_iteration_to_png(folder_name, i, iteration):
             fig, ax = plt.subplots()
             self._visualize_graph(iteration, i, ax)
-
-            plt.savefig(f"{folder_name}/interaction_{i+1}.png")
-            with open(f"{folder_name}/interaction_{i+1}.tex", "w") as file:
-                file.write(lge.to_latex(iteration))
+            plt.savefig(f"results/{self.name}/{folder_name}/interaction_{i+1}.png")
             plt.close(fig)
-        print(f"Images exported successfully! Check the folder {folder_name}")
-        
 
+        folder_name = self.export_to_file(write_iteration_to_png)
+        print(f"Images exported successfully! Check the folder {folder_name}")
+
+    def export_to_latex(self):
+        """Exports the result of each iteration to separate image files."""
+        def write_iteration_to_latex(folder_name, i, iteration):
+            with open(f"results/{self.name}/{folder_name}/interaction_{i+1}.tex", "w") as file:
+                file.write(self.to_latex(iteration))
+
+        folder_name = self.export_to_file(write_iteration_to_latex)
+        print(f"Latex files exported successfully! Check the folder {folder_name}")
+
+    def export_to_latex_and_image(self):
+        """Exports the result of each iteration to separate image files."""
+        def write_iteration_to_latex_and_image(self, folder_name, i, iteration):
+            with open(f"results/{self.name}/{folder_name}/interaction_{i+1}.tex", "w") as file:
+                file.write(self.to_latex(iteration))
+            fig, ax = plt.subplots()
+            self._visualize_graph(iteration, i, ax)
+            plt.savefig(f"results/{self.name}/{folder_name}/interaction_{i+1}.png")
+            plt.close(fig)
+
+        folder_name = self.export_to_file(write_iteration_to_latex_and_image)
+        print(f"Latex files and images exported successfully! Check the folder {folder_name}")
+
+        
     def visualize_result(self):
         fig, ax = plt.subplots()
         # Adjust subplot to accommodate buttons
@@ -66,3 +92,85 @@ class Visualizer(ABC):
 
         plt.show()
         
+
+    def to_latex(self, graph: Graph):
+        latex_string = r"""\documentclass{article}
+            \usepackage{graphicx}
+            \usepackage{tikz}
+            \usetikzlibrary{positioning, quotes, shapes.multipart}
+            
+            \begin{document}
+            """
+        latex_string += self.to_latex_raw(graph)
+
+        latex_string += "\end{document}"
+
+        return latex_string
+
+
+    @abstractmethod
+    def to_latex_raw():
+        pass
+
+        
+    def get_label_position(self,graph: Graph, node: Node) -> str:
+        node_id = node.id
+        in_edges = graph.get_edges_to(node_id)
+        out_edges = graph.get_edges_from(node_id)
+
+        if not in_edges and not out_edges:
+            # No edges, label can be placed anywhere
+            return "above"
+
+        # Calculate the number of edges in each direction
+        edge_counts = {
+            "above": 0,
+            "below": 0,
+            "right": 0,
+            "left": 0,
+            "above_right": 0,
+            "above_left": 0,
+            "below_right": 0,
+            "below_left": 0,
+        }
+
+
+        for edge in in_edges + out_edges:
+            from_node = graph.nodes[edge.from_node]
+            to_node = graph.nodes[edge.to_node]
+
+            node_to_check = to_node if from_node.id == node_id else from_node
+
+            if node_to_check.x == node.x and node_to_check.y > node.y:
+                edge_counts["above"] += 1
+            elif node_to_check.x == node.x and node_to_check.y < node.y:
+                edge_counts["below"] += 1
+            elif node_to_check.y == node.y and node_to_check.x < node.x:
+                edge_counts["left"] += 1
+            elif node_to_check.y == node.y and node_to_check.x > node.x:
+                edge_counts["right"] += 1
+            elif node_to_check.x < node.x and node_to_check.y > node.y:
+                edge_counts["above_left"] += 1
+            elif node_to_check.x > node.x and node_to_check.y > node.y:
+                edge_counts["above_right"] += 1
+            elif node_to_check.x < node.x and node_to_check.y < node.y:
+                edge_counts["below_left"] += 1
+            elif node_to_check.x > node.x and node_to_check.y < node.y:
+                edge_counts["below_right"] += 1
+
+        direction_totals = {
+            "above": edge_counts["above"] + edge_counts["above_left"] + edge_counts["above_right"],
+            "below": edge_counts["below"] + edge_counts["below_left"] + edge_counts["below_right"],
+            "left": edge_counts["left"] + edge_counts["above_left"] + edge_counts["below_left"],
+            "right": edge_counts["right"] + edge_counts["above_right"] + edge_counts["below_right"]
+        } 
+
+        if any(count == 0 for count in direction_totals.values()):
+            return min(direction_totals, key=direction_totals.get)
+
+        min_count = min(edge_counts.values())
+        positions = [position for position,
+                    count in edge_counts.items() if count == min_count]
+
+
+        return positions[0].replace("_", " ")

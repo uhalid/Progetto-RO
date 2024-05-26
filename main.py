@@ -1,9 +1,11 @@
 
 
-import sys
+import os, sys
 from graph.graph import Graph
-from algorithms.algorithm import Algorithm
 
+def setup():
+    return
+    os.makedirs("results", exist_ok=True)
 
 def read_graph(filename: str) -> Graph:
     graph = Graph()
@@ -56,6 +58,6 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Please provide the filename as a command-line argument.")
         sys.exit(1)
+    setup()
     filename=sys.argv[1]
-    # add a check if the filename exist
     main(filename)

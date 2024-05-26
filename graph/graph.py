@@ -7,6 +7,7 @@ class Graph:
     def __init__(self):
         self.nodes: Dict[int, Node] = {}
         self.edges: List[Edge] = []
+        self.range_coods: Dict[str, int] = {}
 
     def add_node(self, node_id: int, x: int, y: int):
         self.nodes[node_id] = Node(node_id, x, y)
@@ -56,6 +57,25 @@ class Graph:
                 f"  Edge from {edge.from_node} to {edge.to_node} with capacity {edge.capacity} and flow {edge.flow}")
 
         return "\n".join(result)
+    def get_max_coords(self) -> List[int]:
+        if len(self.range_coods) > 0:
+            return self.range_coods
+        min_x = float("inf")
+        max_x = 0
+        min_y = float("inf")
+        max_y = 0
+        for node in graph:
+            min_x = min(min_x, node.x)
+            max_x = max(max_x, node.x)
+            min_y = min(min_y, node.y)
+            max_y = max(max_y, node.y)
+
+        self.range_coods["min_x"] = min_x
+        self.range_coods["max_x"] = max_x
+        self.range_coods["min_y"] = min_y
+        self.range_coods["max_y"] = max_y
+
+        return  self.range_coods
     
 
 

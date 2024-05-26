@@ -23,6 +23,8 @@ class FordFulkersonManager(Manager[FordFulkerson]):
             self.visualizer.export_to_image()
         elif visualization == "2":
             self.visualizer.visualize_result()
+        elif visualization == "2":
+            self.visualizer.to_latex()
         else:
             print("Invalid selection.")
 

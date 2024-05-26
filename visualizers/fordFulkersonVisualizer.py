@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 class FordFulkersonVisualizer(Visualizer):
-    def __init__(self, name: str = "Ford-Fulkerson Visualizer"):
+    def __init__(self, name: str = "Ford-Fulkerson"):
         super().__init__(name)
 
     def _visualize_graph(self, graph: Graph, iteration: int, ax: plt.Axes):
@@ -41,4 +41,30 @@ class FordFulkersonVisualizer(Visualizer):
         ax.set_title(f"Ford-Fulkerson Iteration {iteration + 1}")
         ax.axis('off')
 
+    def to_latex_raw(self, graph: Graph):
+        latex_string = r"""\begin{tikzpicture}[scale = 3, font = \Large, node distance = 15mm and 15mm,
+                                            V/.style= {circle, draw, fill = gray!30},
+                                            every edge quotes/.style= {auto, font =\footnotesize, sloped}
+                                            ]""" + "\n"
+
+        latex_string += r"\begin{scope}[nodes=V]" + "\n"
+        for node_id, node in graph.nodes.items():
+            node_id = str(node_id)
+            if node.label:
+                latex_string += f"\\node[label={self.get_label_position(graph, node)}:{{{node.label}}}]  ({node_id}) at ({node.x}, {node.y}) {{{node_id}}};\n"
+            else:
+                latex_string += f"\\node ({node_id}) at ({node.x}, {node.y}) {{{node_id}}};\n"
+        latex_string += r"\end{scope}" + "\n"
+
+        latex_string += r"\begin{scope}[->]" + "\n"
+        for edge in graph.edges:
+            if edge.label:
+                latex_string += f"\\draw ({edge.from_node}) edge[\"{edge.label}\"] ({edge.to_node});\n"
+            else:
+                latex_string += f"\\draw ({edge.from_node}) ({edge.to_node});\n"
+        latex_string += r"\end{scope}" + "\n"
+
+        latex_string += r"\end{tikzpicture}" + "\n"
+
+        return latex_string
 

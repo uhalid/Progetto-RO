@@ -14,7 +14,7 @@ class FordFulkerson(Algorithm):
 
         def bfs_find_augmenting_path() -> Tuple[bool, Dict[int, Tuple[int, float]]]:
             """Perform BFS to find an augmenting path and return the path as a dictionary."""
-            parent = {source: (None, float('inf'))}
+            parent = {source: ("-", float('inf'))}
             min_heap = [source]
             while min_heap:
                 current = heapq.heappop(min_heap)
@@ -59,11 +59,18 @@ class FordFulkerson(Algorithm):
             # Record the state of the graph
             copy_graph = self.graph.copy()
             
-            for node_id, (parent, flow) in path.items():
-                if parent is not None:
-                    copy_graph.add_label(node_id, f"[{parent}, {flow}]")
+            for node in copy_graph.nodes.values():
+                if node == source:
+                    copy_graph.add_label(node.id, "[ - , ∞ ]")
+                elif path.get(node.id):
+                    copy_graph.add_label(node.id, f"[{path[node.id][0]}, {path[node.id][1]}]")
                 else:
-                    copy_graph.add_label(node_id, f"[ - , - ]")
+                    copy_graph.add_label(node.id, "[ - , - ]")
+            # for node_id, (parent, flow) in path.items():
+            #     if parent is not None:
+            #         copy_graph.add_label(node_id, f"[{parent}, {flow}]")
+            #     else:
+            #         copy_graph.add_label(node_id, f"[ - , - ]")
             for edge in copy_graph.edges:
                 edge.label = f"{edge.flow}/{edge.capacity}"
 
@@ -109,8 +116,6 @@ if __name__ == "__main__":
     ff = FordFulkerson(g)
     max_flow, iterations = ff.run(0, 8)
 
-    ff.export_to_image()
-    ff.visualize_result()
     print(f"Max Flow: {max_flow}")
     for i, iteration in enumerate(iterations):
         print(f"Iteration {i}:")
