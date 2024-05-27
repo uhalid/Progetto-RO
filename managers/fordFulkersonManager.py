@@ -32,6 +32,7 @@ class FordFulkersonManager(Manager[FordFulkerson]):
             print("2. Export to Image")
             print("3. Export to LaTeX")
             print("4. Export to Image and LaTeX")
+            print("5. Export to Json")
             visualization = input("Enter the number of the visualization method: ")
             if visualization == "1":
                 self.visualizer.visualize_result()
@@ -41,6 +42,8 @@ class FordFulkersonManager(Manager[FordFulkerson]):
                 self.visualizer.export_to_latex()
             elif visualization == "4":
                 self.visualizer.export_to_latex_and_image()
+            elif visualization == "5":
+                self.visualizer.export_to_file_json()
             elif visualization == "0":
                 break
             else:

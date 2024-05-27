@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Tuple
+import json
+from typing import Callable, Dict, Tuple
 from graph.graph import Graph
 from graph.node import Node
 import matplotlib.pyplot as plt
@@ -61,6 +62,20 @@ class Visualizer(ABC):
         folder_name = self.export_to_file(write_iteration_to_latex_and_image)
         print(f"Latex files and images exported successfully! Check the folder {folder_name}")
 
+    @abstractmethod
+    def to_json(self, graph: Graph) -> Dict:
+        pass
+
+    def export_to_file_json(self):
+        def write_iteration_to_json(folder_name, i, iteration):
+
+            data = self.to_json(iteration, i)
+
+            with open(f"results/{self.name}/{folder_name}/interaction_{i + 1}.json", "w") as file:
+                json.dump(data, file, indent=2)
+
+        folder_name = self.export_to_file(write_iteration_to_json)
+        print(f"Text files exported successfully! Check the folder {folder_name}")
         
     def visualize_result(self):
         fig, ax = plt.subplots()

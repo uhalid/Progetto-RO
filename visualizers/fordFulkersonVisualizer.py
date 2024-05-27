@@ -83,4 +83,19 @@ class FordFulkersonVisualizer(Visualizer):
         latex_string += r"\end{tikzpicture}" + "\n"
 
         return latex_string
+    def to_json(self, graph: Graph, i: int, ):
+        data = {
+            "iteration": i + 1,
+            "flow_changes": [
+                {"from": edge.from_node,
+                 "to": edge.to_node, "flow": edge.flow}
+                for edge in graph.get_edges()
+            ],
+            "residual_graph": [
+                {"from": edge.from_node, "to": edge.to_node,
+                 "residual_capacity": edge.capacity - edge.flow}
+                for edge in graph.get_edges()
+            ]
+        }
+        return data
 
