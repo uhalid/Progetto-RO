@@ -25,20 +25,24 @@ class FordFulkersonManager(Manager[FordFulkerson]):
 
         print(f"Max Flow: {max_flow}")
 
-        print("How would you like to visualize the result?")
-        print("1. Visualize Results")
-        print("2. Export to Image")
-        print("3. Export to LaTeX")
-        print("4. Export to Image and LaTeX")
-        visualization = input("Enter the number of the visualization method: ")
-        if visualization == "1":
-            self.visualizer.visualize_result()
-        elif visualization == "2":
-            self.visualizer.export_to_image()
-        elif visualization == "3":
-            self.visualizer.export_to_latex()
-        elif visualization == "4":
-            self.visualizer.export_to_latex_and_image()
-        else:
-            print("Invalid selection.")
+        while True:
+            print("How would you like to visualize the result?")
+            print("0. Exit")
+            print("1. Visualize Results")
+            print("2. Export to Image")
+            print("3. Export to LaTeX")
+            print("4. Export to Image and LaTeX")
+            visualization = input("Enter the number of the visualization method: ")
+            if visualization == "1":
+                self.visualizer.visualize_result()
+            elif visualization == "2":
+                self.visualizer.export_to_image()
+            elif visualization == "3":
+                self.visualizer.export_to_latex()
+            elif visualization == "4":
+                self.visualizer.export_to_latex_and_image()
+            elif visualization == "0":
+                break
+            else:
+                print("Invalid selection.")
 

@@ -9,4 +9,4 @@ class Edge:
         self.style: str = "solid" # other commons options are dashed, dotted
 
     def __str__(self) -> str:
-        return f"Edge({self.from_node}, {self.to_node}) - capacity: {self.capacity}, flow: {self.flow}, cost: {self.cost}, label: {self.label}"
+        return f"Edge({self.from_node}, {self.to_node}) - capacity: {self.capacity}, flow: {self.flow}, cost: {self.cost}, label: {self.label}, style: {self.style})"
