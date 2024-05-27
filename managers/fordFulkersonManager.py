@@ -1,32 +1,44 @@
 from .manager import Manager
 from algorithms.fordFulkerson import FordFulkerson
 from visualizers.fordFulkersonVisualizer import FordFulkersonVisualizer
+from graph.graph import Graph
 
 class FordFulkersonManager(Manager[FordFulkerson]):
-    def __init__(self, graph):
+    def __init__(self, graph: Graph):
+        self.graph: Graph = graph
         super().__init__(FordFulkerson(graph), FordFulkersonVisualizer())
         
 
     def run(self):
-        source = int(input("Enter the source node: "))
-        sink = int(input("Enter the sink node: "))
+        source = input("Enter the source node: ")
+        while not source.isdigit() or not self.graph.nodes.get(int(source)):
+            source = input("Invalid node. Enter the source node: ")
+        source = int(source)
+
+        sink = input("Enter the sink node: ")
+        while not sink.isdigit() or not self.graph.nodes.get(int(sink)):
+            sink = input("Invalid node. Enter the sink node: ")
+        sink = int(sink)
+
         max_flow, _ = self.algorithm.run(source, sink)
         self.visualizer.iterations = self.algorithm.iterations
 
         print(f"Max Flow: {max_flow}")
 
         print("How would you like to visualize the result?")
-        print("1. Export to image files")
-        print("2. Visualize interactively")
+        print("1. Visualize interactively")
+        print("2. Export to image files")
+        print("3. Export to latex")
+        print("4. Export to latex and image files")
         visualization = input("Enter the number of the visualization method: ")
         if visualization == "1":
-            self.visualizer.export_to_image()
-        elif visualization == "2":
             self.visualizer.visualize_result()
         elif visualization == "2":
-            self.visualizer.to_latex()
+            self.visualizer.export_to_image()
+        elif visualization == "3":
+            self.visualizer.export_to_latex()
+        elif visualization == "4":
+            self.visualizer.export_to_latex_and_image()
         else:
             print("Invalid selection.")
 
-    def _run_algorithm(self):
-        pass

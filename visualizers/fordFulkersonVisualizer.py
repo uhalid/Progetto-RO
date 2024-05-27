@@ -31,12 +31,15 @@ class FordFulkersonVisualizer(Visualizer):
 
 
         nx.draw_networkx_edges(
-            G, pos, edge_color='black', arrows=True, ax=ax)
+            G, pos, edge_color='gray', arrows=True, ax=ax)
         edge_labels = {
             (u, v): f"{d['weight']}/{d['capacity']}" for u, v, d in G.edges(data=True)}
         nx.draw_networkx_edge_labels(
             G, pos, edge_labels=edge_labels, font_size=8, ax=ax)
 
+        pos_label = {node_id: self.get_offset_label(graph, graph.nodes[node_id]) for node_id in pos.keys()}
+
+        nx.draw_networkx_labels(G, pos_label, labels={node_id: graph.nodes[node_id].label for node_id in G.nodes()}, font_color="black", ax=ax, font_size=8)
 
         ax.set_title(f"Ford-Fulkerson Iteration {iteration + 1}")
         ax.axis('off')
@@ -59,9 +62,9 @@ class FordFulkersonVisualizer(Visualizer):
         latex_string += r"\begin{scope}[->]" + "\n"
         for edge in graph.edges:
             if edge.label:
-                latex_string += f"\\draw ({edge.from_node}) edge[\"{edge.label}\"] ({edge.to_node});\n"
+                latex_string += f"\\draw ({edge.from_node}) edge[\"{edge.label}\", {edge.style}] ({edge.to_node});\n"
             else:
-                latex_string += f"\\draw ({edge.from_node}) ({edge.to_node});\n"
+                latex_string += f"\\draw ({edge.from_node}) edge["", {edge.style}] ({edge.to_node});\n"
         latex_string += r"\end{scope}" + "\n"
 
         latex_string += r"\end{tikzpicture}" + "\n"

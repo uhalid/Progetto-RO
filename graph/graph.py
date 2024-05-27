@@ -10,13 +10,16 @@ class Graph:
         self.range_coods: Dict[str, int] = {}
 
     def add_node(self, node_id: int, x: int, y: int):
+        """Adds a node to the graph."""
         self.nodes[node_id] = Node(node_id, x, y)
 
     def add_edge(self, from_node: int, to_node: int, capacity: float, cost: float = 0.0):
+        """Adds an edge to the graph."""
         edge = Edge(from_node, to_node, capacity, cost)
         self.edges.append(edge)
 
     def get_edges(self):
+        """Returns all the edges in the graph."""
         return self.edges
 
     def get_edges_from(self, node_id: int) -> List[Edge]:
@@ -35,6 +38,7 @@ class Graph:
         return None
     
     def add_label(self, node_id: int, label: str):
+        """Adds a label to a node with id node_id."""
         self.nodes[node_id].add_label(label)
 
     def copy(self) -> 'Graph':
@@ -57,25 +61,7 @@ class Graph:
                 f"  Edge from {edge.from_node} to {edge.to_node} with capacity {edge.capacity} and flow {edge.flow}")
 
         return "\n".join(result)
-    def get_max_coords(self) -> List[int]:
-        if len(self.range_coods) > 0:
-            return self.range_coods
-        min_x = float("inf")
-        max_x = 0
-        min_y = float("inf")
-        max_y = 0
-        for node in graph:
-            min_x = min(min_x, node.x)
-            max_x = max(max_x, node.x)
-            min_y = min(min_y, node.y)
-            max_y = max(max_y, node.y)
 
-        self.range_coods["min_x"] = min_x
-        self.range_coods["max_x"] = max_x
-        self.range_coods["min_y"] = min_y
-        self.range_coods["max_y"] = max_y
-
-        return  self.range_coods
     
 
 

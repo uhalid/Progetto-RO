@@ -50,6 +50,15 @@ class FordFulkerson(Algorithm):
                 current = prev
             return flow
 
+        def trace_back(path: Dict[int, Tuple[int, float]], current_node: int):
+            path_to_source = []
+            while current_node != source:
+                path_to_source.append([abs(path[current_node][0]), abs(current_node)])
+                current_node = abs(path[current_node][0])
+            path_to_source.reverse()
+            return path_to_source
+
+
         while True:
             found, path = bfs_find_augmenting_path()
             if not found:
@@ -61,18 +70,20 @@ class FordFulkerson(Algorithm):
             
             for node in copy_graph.nodes.values():
                 if node == source:
-                    copy_graph.add_label(node.id, "[ - , ∞ ]")
+                    copy_graph.add_label(node.id, f"[ {source} , ∞]")
                 elif path.get(node.id):
                     copy_graph.add_label(node.id, f"[{path[node.id][0]}, {path[node.id][1]}]")
                 else:
-                    copy_graph.add_label(node.id, "[ - , - ]")
-            # for node_id, (parent, flow) in path.items():
-            #     if parent is not None:
-            #         copy_graph.add_label(node_id, f"[{parent}, {flow}]")
-            #     else:
-            #         copy_graph.add_label(node_id, f"[ - , - ]")
+                    copy_graph.add_label(node.id, "[0 , 0]")
+
             for edge in copy_graph.edges:
                 edge.label = f"{edge.flow}/{edge.capacity}"
+
+            path_to_source = trace_back(path, sink)
+            for edge_from, edge_to in path_to_source:
+                edge = copy_graph.get_edge_between(edge_from, edge_to)
+                edge.style = "dashed"
+
 
             self.iterations.append(copy_graph)
 

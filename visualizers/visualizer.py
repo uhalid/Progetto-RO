@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Tuple
 from graph.graph import Graph
 from graph.node import Node
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ class Visualizer(ABC):
         os.makedirs(f"results/{self.name}/{folder_name}", exist_ok=True)
 
         for i, iteration in enumerate(self.iterations):
-            export_function(iteration, i, folder_name)
+            export_function(folder_name, i, iteration)
         return folder_name
 
     def export_to_image(self):
@@ -50,7 +50,7 @@ class Visualizer(ABC):
 
     def export_to_latex_and_image(self):
         """Exports the result of each iteration to separate image files."""
-        def write_iteration_to_latex_and_image(self, folder_name, i, iteration):
+        def write_iteration_to_latex_and_image(folder_name, i, iteration):
             with open(f"results/{self.name}/{folder_name}/interaction_{i+1}.tex", "w") as file:
                 file.write(self.to_latex(iteration))
             fig, ax = plt.subplots()
@@ -68,15 +68,20 @@ class Visualizer(ABC):
         plt.subplots_adjust(bottom=0.2)
 
         def next_iteration(event):
+            ax.clear()
             self.current_iteration = (
                 self.current_iteration + 1) % len(self.iterations)
-            self._visualize_graph(self.iterations[self.current_iteration], self.current_iteration, ax)
+            current_graph = self.iterations[self.current_iteration]
+            self._visualize_graph(current_graph, self.current_iteration, ax)
             fig.canvas.draw_idle()
 
         def prev_iteration(event):
+            ax.clear()
             self.current_iteration = (
                 self.current_iteration - 1) % len(self.iterations)
-            self._visualize_graph(self.iterations[self.current_iteration], self.current_iteration, ax)
+            current_graph = self.iterations[self.current_iteration]
+            self._visualize_graph(current_graph, self.current_iteration, ax)
+            # plt.xlim(, xmax)
             fig.canvas.draw_idle()
 
         # Create buttons
@@ -111,6 +116,21 @@ class Visualizer(ABC):
     @abstractmethod
     def to_latex_raw():
         pass
+
+    def get_offset_label(self, graph: Graph, node: Node) -> Tuple[float, float]:
+        label_position = self.get_label_position(graph, node)
+        default_offset = 0.13
+
+        offset = (0, 0)
+        if "above" in label_position:
+            offset = (0, default_offset)
+        elif "below" in label_position:
+            offset = (0, -default_offset)
+        else:
+            offset = (0, default_offset)
+        
+        return (node.x + offset[0], node.y + offset[1])
+        
 
         
     def get_label_position(self,graph: Graph, node: Node) -> str:
@@ -158,6 +178,7 @@ class Visualizer(ABC):
             elif node_to_check.x > node.x and node_to_check.y < node.y:
                 edge_counts["below_right"] += 1
 
+        #first check if there is no edge from that direction
         direction_totals = {
             "above": edge_counts["above"] + edge_counts["above_left"] + edge_counts["above_right"],
             "below": edge_counts["below"] + edge_counts["below_left"] + edge_counts["below_right"],
@@ -168,6 +189,8 @@ class Visualizer(ABC):
         if any(count == 0 for count in direction_totals.values()):
             return min(direction_totals, key=direction_totals.get)
 
+
+        #if there is an edge from each direction, choose the one with the least number of edges
         min_count = min(edge_counts.values())
         positions = [position for position,
                     count in edge_counts.items() if count == min_count]
