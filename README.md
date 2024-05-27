@@ -3,7 +3,7 @@
 ## Description
 
 The main goal of this project is to implent a Ford-Fulkerson algortithm, but I designed it to allow multpliple algorithms to be run without changing the existing code base.
-The program allows users to run the algorithm and choose from various output options, including visualization, exporting to images, LaTeX files, or both.
+The program allows users to run the algorithm and choose from various output options, including visualization, exporting to json, images, LaTeX files, or both.
 
 ## Prerequisites
 
@@ -91,3 +91,4 @@ You can choose from the following output options:
 2. **Export to Image**: Exports images of each interaction to the `results/FordFulkerson` folder.
 3. **Export to LaTeX**: Exports a LaTeX file of each interaction to the `results/FordFulkerson` folder.
 4. **Export to Image and LaTeX**: Exports both PNG files and a LaTeX files to the `results/FordFulkerson` folder
+5. **Export to Json**: Exports a json file of each interaction to the `results/FordFulkerson` folder
