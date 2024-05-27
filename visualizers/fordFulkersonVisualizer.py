@@ -19,7 +19,7 @@ class FordFulkersonVisualizer(Visualizer):
 
         for edge in graph.edges:
             G.add_edge(edge.from_node, edge.to_node,
-                       weight=edge.flow, capacity=edge.capacity)
+                       weight=edge.flow, capacity=edge.capacity, style=edge.style)
 
         pos = nx.get_node_attributes(G, 'pos')
         
@@ -30,8 +30,21 @@ class FordFulkersonVisualizer(Visualizer):
             G, pos, font_size=10, font_color='black', ax=ax)
 
 
-        nx.draw_networkx_edges(
-            G, pos, edge_color='gray', arrows=True, ax=ax)
+        solid_edges = [(edge.from_node, edge.to_node)
+                    for edge in graph.edges if edge.style == 'solid']
+        dashed_edges = [(edge.from_node, edge.to_node)
+                        for edge in graph.edges if edge.style == 'dashed']
+
+
+        nx.draw_networkx_edges(G, pos, edgelist=solid_edges,
+                            edge_color='gray', style='-', arrows=True, ax=ax)
+
+        # Draw dashed edges
+        nx.draw_networkx_edges(G, pos, edgelist=dashed_edges,
+                            edge_color='gray', style='--', arrows=True, ax=ax)
+
+        # nx.draw_networkx_edges(
+        #     G, pos, edge_color='gray', arrows=True, ax=ax)
         edge_labels = {
             (u, v): f"{d['weight']}/{d['capacity']}" for u, v, d in G.edges(data=True)}
         nx.draw_networkx_edge_labels(

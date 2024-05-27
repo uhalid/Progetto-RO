@@ -45,7 +45,7 @@ class FordFulkerson(Algorithm):
                 prev, _ = path[abs(current)]
                 if edge:= self.graph.get_edge_between(abs(prev), abs(current)):
                     edge.flow += flow
-                if edge:= self.graph.get_edge_between(abs(current), abs(prev)):
+                elif edge:= self.graph.get_edge_between(abs(current), abs(prev)):
                     edge.flow -= flow
                 current = prev
             return flow
@@ -81,8 +81,10 @@ class FordFulkerson(Algorithm):
 
             path_to_source = trace_back(path, sink)
             for edge_from, edge_to in path_to_source:
-                edge = copy_graph.get_edge_between(edge_from, edge_to)
-                edge.style = "dashed"
+                if edge := copy_graph.get_edge_between(edge_from, edge_to):
+                    edge.style = "dashed"
+                elif edge:= copy_graph.get_edge_between(edge_to, edge_from):
+                    edge.style = "dashed"
 
 
             self.iterations.append(copy_graph)
