@@ -1,4 +1,3 @@
-```markdown
 # Progetto RO
 
 ## Description
@@ -89,6 +88,6 @@ After launching the program, you will be prompted to choose which algorithm to r
 You can choose from the following output options:
 
 1. **Visualize Results**: Opens a Matplotlib window showing all the different interactions.
-2. **Export to Image**: Exports images of each interaction to the `results/FordFulkerson` folder, with a subfolder named after the execution time.
-3. **Export to LaTeX**: Exports a LaTeX file to the `results/FordFulkerson` folder.
-4. **Export to Images and LaTeX**: Exports both PNG files and a LaTeX file to the `results/FordFulkerson` folder.
+2. **Export to Image**: Exports images of each interaction to the `results/FordFulkerson` folder.
+3. **Export to LaTeX**: Exports a LaTeX file of each interaction to the `results/FordFulkerson` folder.
+4. **Export to Image and LaTeX**: Exports both PNG files and a LaTeX files to the `results/FordFulkerson` folder
