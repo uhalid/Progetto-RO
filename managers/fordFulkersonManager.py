@@ -26,10 +26,10 @@ class FordFulkersonManager(Manager[FordFulkerson]):
         print(f"Max Flow: {max_flow}")
 
         print("How would you like to visualize the result?")
-        print("1. Visualize interactively")
-        print("2. Export to image files")
-        print("3. Export to latex")
-        print("4. Export to latex and image files")
+        print("1. Visualize Results")
+        print("2. Export to Image")
+        print("3. Export to LaTeX")
+        print("4. Export to Image and LaTeX")
         visualization = input("Enter the number of the visualization method: ")
         if visualization == "1":
             self.visualizer.visualize_result()
