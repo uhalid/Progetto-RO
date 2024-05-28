@@ -64,6 +64,9 @@ class Visualizer(ABC):
             plt.close(fig)
 
         folder_name = self.export_to_file(write_iteration_to_latex_and_image)
+        latex_str = self.to_latex_all(folder_name)
+        with open(f"results/{self.name}/{folder_name}/all_interactions.tex", "w") as file:
+            file.write(latex_str)
         print(f"Latex files and images exported successfully! Check the folder {folder_name}")
 
     @abstractmethod
