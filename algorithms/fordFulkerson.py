@@ -14,7 +14,7 @@ class FordFulkerson(Algorithm):
 
         def bfs_find_augmenting_path() -> Tuple[bool, Dict[int, Tuple[int, float]]]:
             """Perform BFS to find an augmenting path and return the path as a dictionary."""
-            parent = {source: ("-", float('inf'))}
+            parent = {source: (str(source), float('inf'))}
             min_heap = [source]
             while min_heap:
                 current = heapq.heappop(min_heap)
@@ -62,6 +62,14 @@ class FordFulkerson(Algorithm):
         while True:
             found, path = bfs_find_augmenting_path()
             if not found:
+                copy_graph = self.graph.copy()
+                for edge in copy_graph.edges:
+                    edge.label = f"{edge.flow}/{edge.capacity}"
+                    if edge.flow > 0:
+                        edge.style = "dashed"
+                for node_id, node in copy_graph.nodes.items():
+                    node.add_label(str(sum([edge.flow for edge in copy_graph.get_edges_to(node_id)])))
+                self.iterations.append(copy_graph)
                 break
             delta = augment_flow(path)
             max_flow += delta
@@ -69,8 +77,8 @@ class FordFulkerson(Algorithm):
             copy_graph = self.graph.copy()
             
             for node in copy_graph.nodes.values():
-                if node == source:
-                    copy_graph.add_label(node.id, f"[ {source} , ∞]")
+                if node.id == source:
+                    copy_graph.add_label(node.id, f"[${source} , \infty$]")
                 elif path.get(node.id):
                     copy_graph.add_label(node.id, f"[{path[node.id][0]}, {path[node.id][1]}]")
                 else:

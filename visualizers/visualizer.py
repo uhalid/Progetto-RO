@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import json
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, List, Tuple
 from graph.graph import Graph
 from graph.node import Node
 import matplotlib.pyplot as plt
@@ -11,9 +11,9 @@ import os, datetime
 
 class Visualizer(ABC):
     def __init__(self, name: str = "Visualizer"):
-        self.current_iteration = 0
-        self.iterations = []
-        self.name = name
+        self.current_iteration: int = 0
+        self.iterations: List[Graph] = []
+        self.name: str = name
 
 
     @abstractmethod
@@ -47,6 +47,10 @@ class Visualizer(ABC):
                 file.write(self.to_latex(iteration))
 
         folder_name = self.export_to_file(write_iteration_to_latex)
+        latex_str = self.to_latex_all(folder_name)
+        with open(f"results/{self.name}/{folder_name}/all_interactions.tex", "w") as file:
+            file.write(latex_str)
+
         print(f"Latex files exported successfully! Check the folder {folder_name}")
 
     def export_to_latex_and_image(self):
@@ -127,6 +131,21 @@ class Visualizer(ABC):
 
         return latex_string
 
+    def to_latex_all(self, folder_name: str):
+        latex_string = r"""\documentclass{article}
+            \usepackage{graphicx}
+            \usepackage{tikz}
+            \usetikzlibrary{positioning, quotes, shapes.multipart}
+            
+            \begin{document}
+            """
+
+        all_latex = [self.to_latex_raw(iteration) for iteration in self.iterations[1:]]
+        latex_string += "\n\n".join(all_latex)
+
+        latex_string += "\end{document}"
+
+        return latex_string
 
     @abstractmethod
     def to_latex_raw():
