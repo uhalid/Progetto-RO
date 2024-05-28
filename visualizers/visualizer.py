@@ -127,7 +127,7 @@ class Visualizer(ABC):
             """
         latex_string += self.to_latex_raw(graph)
 
-        latex_string += "\end{document}"
+        latex_string += r"\end{document}"
 
         return latex_string
 
@@ -143,7 +143,7 @@ class Visualizer(ABC):
         all_latex = [self.to_latex_raw(iteration) for iteration in self.iterations[1:]]
         latex_string += "\n\n".join(all_latex)
 
-        latex_string += "\end{document}"
+        latex_string += r"\end{document}"
 
         return latex_string
 

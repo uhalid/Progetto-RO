@@ -78,7 +78,7 @@ class FordFulkerson(Algorithm):
             
             for node in copy_graph.nodes.values():
                 if node.id == source:
-                    copy_graph.add_label(node.id, f"[${source} , \infty$]")
+                    copy_graph.add_label(node.id, rf"[${source} , \infty$]")
                 elif path.get(node.id):
                     copy_graph.add_label(node.id, f"[{path[node.id][0]}, {path[node.id][1]}]")
                 else:
